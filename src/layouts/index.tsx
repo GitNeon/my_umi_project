@@ -43,14 +43,11 @@ export const onScrollFrame = (values: positionValues) => {
 };
 
 export default function Layout() {
+  console.log(process.env.UMI_ENV);
   return (
     <Container>
       <NavigationBar>
-        <Scrollbars
-          autoHide
-          autoHideTimeout={1000}
-          onScrollFrame={onScrollFrame}
-        >
+        <Scrollbars autoHide autoHideTimeout={1000} onScrollFrame={onScrollFrame}>
           <HeaderLogo>
             <div
               style={{
@@ -59,9 +56,7 @@ export default function Layout() {
               }}
             >
               <img src={apple} alt="lemon-logo" width={50} height={50} />
-              <div
-                style={{ width: 10, display: 'inline-block', fontSize: 0 }}
-              />
+              <div style={{ width: 10, display: 'inline-block', fontSize: 0 }} />
               <span style={logo_text_style}>AMAZING</span>
             </div>
           </HeaderLogo>
