@@ -1,8 +1,10 @@
-import { Menu } from '@arco-design/web-react';
+import { getMenuList } from '@/layouts/sever';
+import { Menu, Message } from '@arco-design/web-react';
 import '@arco-design/web-react/dist/css/arco.css';
-import { IconApps, IconBug, IconBulb } from '@arco-design/web-react/icon';
 import styled from '@emotion/styled';
+import { useRequest } from 'ahooks';
 import { positionValues, Scrollbars } from 'react-custom-scrollbars';
+import { Outlet, useNavigate } from 'umi';
 import apple from '../assets/apple.svg';
 import './base.css';
 
@@ -10,6 +12,8 @@ const MenuItem = Menu.Item;
 const SubMenu = Menu.SubMenu;
 
 export const Container = styled.div({
+  display: 'flex',
+  flexWrap: 'nowrap',
   height: '100%',
   backgroundColor: '#FFFFFF',
 });
@@ -43,12 +47,54 @@ export const onScrollFrame = (values: positionValues) => {
 };
 
 export default function Layout() {
-  console.log(process.env.UMI_ENV);
+  const { data, loading } = useRequest(getMenuList);
+
+  let navigate = useNavigate();
+
+  const searchRoutePath = (key: string, pathArray: any[]): string => {
+    for (let i = 0; i < pathArray.length; i++) {
+      let item = pathArray[i];
+      if (item.menuId === key) {
+        return item.routePath;
+      }
+      if (item.children) {
+        let path = searchRoutePath(key, item.children);
+        if (path !== '') return path;
+      }
+    }
+
+    return '';
+  };
+
+  const onClickMenuItem = (key: string, event: any, keyPath: string[]) => {
+    // 这里仍然可以优化，比如只遍历一次保存对应关系即可
+    const routePath = searchRoutePath(key, data.data);
+    if (routePath === undefined || routePath === '') {
+      return Message.error('未找到功能模块的路由路径');
+    }
+    navigate(routePath, { replace: true });
+  };
+
+  const getTreeMenu = (menuData: any) => {
+    if (menuData.length > 0) {
+      return menuData.map((item: any) => {
+        if (item?.children?.length > 0) {
+          return (
+            <SubMenu key={item.menuId} title={item.menuName}>
+              {getTreeMenu(item.children)}
+            </SubMenu>
+          );
+        }
+        return <MenuItem key={item.menuId}>{item.menuName}</MenuItem>;
+      });
+    }
+  };
+
   return (
     <Container>
       <NavigationBar>
         <Scrollbars autoHide autoHideTimeout={1000} onScrollFrame={onScrollFrame}>
-          <HeaderLogo>
+          <HeaderLogo style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
             <div
               style={{
                 display: 'inline-block',
@@ -60,90 +106,12 @@ export default function Layout() {
               <span style={logo_text_style}>AMAZING</span>
             </div>
           </HeaderLogo>
-
-          <Menu>
-            <SubMenu
-              key="0"
-              title={
-                <>
-                  <IconApps /> Navigation 1
-                </>
-              }
-            >
-              <MenuItem key="0_0">Menu 1</MenuItem>
-              <MenuItem key="0_1">Menu 2</MenuItem>
-              <MenuItem key="0_2" disabled>
-                Menu 3
-              </MenuItem>
-            </SubMenu>
-            <SubMenu
-              key="1"
-              title={
-                <>
-                  <IconBug /> Navigation 2
-                </>
-              }
-            >
-              <MenuItem key="1_0">Menu 1</MenuItem>
-              <MenuItem key="1_1">Menu 2</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-              <MenuItem key="1_2">Menu 3</MenuItem>
-            </SubMenu>
-            <SubMenu
-              key="2"
-              title={
-                <>
-                  <IconBulb /> Navigation 3
-                </>
-              }
-            >
-              <MenuItem key="2_0">Menu 1</MenuItem>
-              <MenuItem key="2_1">Menu 2</MenuItem>
-              <MenuItem key="2_2">Menu 3</MenuItem>
-            </SubMenu>
-          </Menu>
+          <Menu onClickMenuItem={onClickMenuItem}>{data && getTreeMenu(data.data)}</Menu>
         </Scrollbars>
       </NavigationBar>
+      <div style={{ padding: '20px' }}>
+        <Outlet />
+      </div>
     </Container>
   );
 }

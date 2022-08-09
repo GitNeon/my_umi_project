@@ -15,4 +15,12 @@ export default defineConfig({
   deadCode: {},
   // 配置额外的css，作为style标签插入index.html中
   styles: [`html,body { height: 100%; margin: 0; }`, `#root { height: 100%; }`],
+  // 配置代理,仅dev有效
+  proxy: {
+    '/api': {
+      target: 'http://xxxx/',
+      changeOrigin: true,
+      pathRewrite: { '^/api': '' },
+    },
+  },
 });

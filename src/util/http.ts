@@ -56,7 +56,7 @@ const errorHandler = (error: { response: Response }): Response => {
 /**
  * 配置request请求时的默认参数
  */
-const request = extend({
+const http = extend({
   errorHandler, // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
 });
@@ -71,7 +71,7 @@ const apiPreFix: ApiPrefix = {
 /**
  * request拦截器, 携带token,以及根据环境,配置不同的请求前缀
  */
-request.interceptors.request.use((url: string, options: RequestOptionsInit) => {
+http.interceptors.request.use((url: string, options: RequestOptionsInit) => {
   // 哪些请求不需要带token,放入数组中
   let notCarryTokenArr: string[] = [];
   if (notCarryTokenArr.includes(url)) {
@@ -94,41 +94,34 @@ request.interceptors.request.use((url: string, options: RequestOptionsInit) => {
 /**
  * 封装的get,post.put,delete请求
  */
-const get = async (url: string, parameter?: Record<string, unknown>): Promise<any> => {
+export const get = async (url: string, parameter?: Record<string, unknown>): Promise<any> => {
   try {
-    return await request(url, { method: 'get', params: parameter });
+    return await http(url, { method: 'get', params: parameter });
   } catch (error) {
     console.error(error);
   }
 };
 
-const deletes = async (url: string, parameter?: Record<string, unknown>): Promise<any> => {
+export const deletes = async (url: string, parameter?: Record<string, unknown>): Promise<any> => {
   try {
-    return await request(url, { method: 'delete', params: parameter });
+    return await http(url, { method: 'delete', params: parameter });
   } catch (error) {
     console.error(error);
   }
 };
 
-const post = async (url: string, parameter?: Record<string, unknown>): Promise<any> => {
+export const post = async (url: string, parameter?: Record<string, unknown>): Promise<any> => {
   try {
-    return await request(url, { method: 'post', data: parameter });
+    return await http(url, { method: 'post', data: parameter });
   } catch (error) {
     console.error(error);
   }
 };
 
-const put = async (url: string, parameter?: Record<string, unknown>): Promise<any> => {
+export const put = async (url: string, parameter?: Record<string, unknown>): Promise<any> => {
   try {
-    return await request(url, { method: 'put', data: parameter });
+    return await http(url, { method: 'put', data: parameter });
   } catch (error) {
     console.error(error);
   }
-};
-
-export default {
-  get,
-  post,
-  put,
-  deletes,
 };
