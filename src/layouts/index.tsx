@@ -6,8 +6,6 @@ import { useRequest } from 'ahooks';
 import { positionValues, Scrollbars } from 'react-custom-scrollbars';
 import { Outlet, useNavigate } from 'umi';
 import apple from '../assets/apple.svg';
-import './base.css';
-
 const MenuItem = Menu.Item;
 const SubMenu = Menu.SubMenu;
 
