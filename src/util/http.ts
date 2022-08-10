@@ -4,9 +4,9 @@
  * @Description: 请求通用封装umi-request,
  * 更详细的api文档: https://github.com/umijs/umi-request
  */
-import { notification } from 'antd';
+import { message, notification } from 'antd';
 import type { RequestOptionsInit } from 'umi-request';
-import { extend } from 'umi-request';
+import request, { extend } from 'umi-request';
 
 type mapCode = 200 | 400 | 500;
 
@@ -15,6 +15,13 @@ interface ApiPrefix {
   sit: string;
   prod: string;
   uat: string;
+}
+
+interface DownloadType {
+  url: string;
+  fileName: string;
+  params: any;
+  options?: Record<string, any>;
 }
 
 let currentEnvironment: string = process.env.UMI_ENV || 'dev';
@@ -91,9 +98,6 @@ http.interceptors.request.use((url: string, options: RequestOptionsInit) => {
   };
 });
 
-/**
- * 封装的get,post.put,delete请求
- */
 export const get = async (url: string, parameter?: Record<string, unknown>): Promise<any> => {
   try {
     return await http(url, { method: 'get', params: parameter });
@@ -124,4 +128,37 @@ export const put = async (url: string, parameter?: Record<string, unknown>): Pro
   } catch (error) {
     console.error(error);
   }
+};
+
+export const downloadFile = ({ url, fileName, params, options }: DownloadType) => {
+  request<any>(url, {
+    method: 'GET',
+    responseType: 'blob',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  }).then((res: Blob) => {
+    console.log(res);
+    // 返回错误时需要处理json
+    if (res?.type === 'application/json') {
+      const reader = new FileReader();
+      reader.readAsText(res, 'utf-8');
+      reader.onload = () => {
+        const response = JSON.parse(<string>reader.result);
+        console.log(response);
+        message.error(response?.message);
+      };
+      return;
+    }
+    const blob = new Blob([res]);
+    const objectURL = URL.createObjectURL(blob);
+    let btn = document.createElement('a');
+    btn.download = fileName;
+    btn.href = objectURL;
+    btn.click();
+    URL.revokeObjectURL(objectURL);
+    // @ts-ignore
+    btn = null;
+  });
 };
