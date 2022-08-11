@@ -48,6 +48,18 @@ export const getMenuList = async (): Promise<any> => {
           },
         ],
       },
+      {
+        menuId: '4',
+        menuName: 'DVA',
+        icon: 'icon-dva',
+        children: [
+          {
+            menuId: '4-1',
+            menuName: 'DVA基本用法',
+            routePath: '../dva',
+          },
+        ],
+      },
     ];
 
     setTimeout(() => {
@@ -56,6 +68,6 @@ export const getMenuList = async (): Promise<any> => {
         msg: '请求成功',
         data: data,
       });
-    }, 2000);
+    }, 1000);
   });
 };

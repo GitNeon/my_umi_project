@@ -23,4 +23,6 @@ export default defineConfig({
       pathRewrite: { '^/api': '' },
     },
   },
+  dva: {},
+  plugins: ['@umijs/plugins/dist/dva'],
 });
