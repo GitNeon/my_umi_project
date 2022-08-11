@@ -8,6 +8,8 @@ export default {
   reducers: {
     add(state: any) {
       state.num += 1;
+      // 如果直接return state, dva会认为没有修改state，所有不会刷新
+      return { ...state };
     },
   },
   effects: {
