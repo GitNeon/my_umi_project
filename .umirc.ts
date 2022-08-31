@@ -8,7 +8,7 @@ import { defineConfig } from 'umi';
 export default defineConfig({
   npmClient: 'pnpm',
   // 页面标题
-  title: 'my umi project',
+  title: 'DEV测试环境',
   // 路由路径，当前端项目没有部署在nginx的根目录时，必须修改这个路径
   base: '/',
   // 检测未使用的文件和导出，仅在 build 阶段开启。
@@ -25,4 +25,12 @@ export default defineConfig({
   },
   dva: {},
   plugins: ['@umijs/plugins/dist/dva'],
+  define: {
+    'process.env': {
+      NODE_ENV: 'dev',
+      UMI_ENV: 'dev',
+      date: '2022-08-01',
+      ip: '255.255.255.255',
+    },
+  },
 });

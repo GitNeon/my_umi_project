@@ -5,5 +5,10 @@
  */
 
 export default () => {
-  return <div>这是ReactUI组件库首页: 读取到的环境变量为：{process.env.UMI_ENV}</div>;
+  return (
+    <div>
+      这是ReactUI组件库首页: 读取到的环境变量为：{process.env.UMI_ENV}, 日期: {process.env.date},
+      ip: {process.env.ip}
+    </div>
+  );
 };
